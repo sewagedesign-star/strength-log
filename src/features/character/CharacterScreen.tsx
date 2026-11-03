@@ -4,6 +4,8 @@ import { goalLabel, goalStatuses } from '../../domain/goals';
 import { levelFromXp } from '../../domain/level';
 import { BODY_PARTS, CATEGORY_LABEL, type Category } from '../../domain/types';
 import { fmtNum, useAllData, useXp } from '../../data';
+import { evaluateAchievements } from '../../domain/achievements';
+import { Achievements } from './Achievements';
 import styles from './CharacterScreen.module.css';
 
 export function CharacterScreen() {
@@ -15,6 +17,11 @@ export function CharacterScreen() {
     const wk = weekStart(toDateKey());
     return xp.sessions.filter((s) => weekStart(s.date) === wk).length;
   }, [xp]);
+
+  const achievements = useMemo(
+    () => (data && xp ? evaluateAchievements(data.sets, data.sessions, data.exercises, data.settings, xp) : []),
+    [data, xp],
+  );
 
   if (!data || !xp) return null;
 
@@ -83,6 +90,10 @@ export function CharacterScreen() {
       <section className={`card ${styles.block}`}>
         <h2 className={styles.h2}>部位ステータス</h2>
         <Radar values={xp.byCategory} />
+      </section>
+
+      <section className={`card ${styles.block}`}>
+        <Achievements list={achievements} />
       </section>
     </div>
   );

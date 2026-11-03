@@ -1,7 +1,9 @@
 import { loadAll } from '../../db/repo';
+import { TIER_LABEL, evaluateAchievements } from '../../domain/achievements';
+import { goalLabel, goalStatuses } from '../../domain/goals';
 import { levelFromXp } from '../../domain/level';
 import { BONUS_LABEL, computeXp, round1 } from '../../domain/xp';
-import type { ToastMessage } from '../../components/Toast';
+import type { Celebration, ToastMessage } from '../../components/Toast';
 import { fmtNum } from '../../data';
 
 async function snapshot(date: string) {
@@ -11,12 +13,20 @@ async function snapshot(date: string) {
     total: xp.total,
     level: levelFromXp(xp.total, all.settings),
     bonuses: xp.sessions.find((s) => s.date === date)?.bonuses ?? [],
-    exName: new Map(all.exercises.map((e) => [e.id, e.name])),
+    exMap: new Map(all.exercises.map((e) => [e.id, e])),
+    goals: goalStatuses(all.goals, all.sets),
+    achievements: evaluateAchievements(all.sets, all.sessions, all.exercises, all.settings, xp),
   };
 }
 
-/** 記録を保存し、獲得XP（とレベルアップ）のトースト内容を返す */
-export async function saveAndReport(date: string, save: () => Promise<unknown>): Promise<ToastMessage> {
+export interface SaveReport {
+  toast: ToastMessage;
+  /** レベルアップ・目標達成・実績（新しく取れたもの） */
+  celebrations: Celebration[];
+}
+
+/** 記録を保存し、獲得XPのトーストと、お祝いのカードの内容を返す */
+export async function saveAndReport(date: string, save: () => Promise<unknown>): Promise<SaveReport> {
   const before = await snapshot(date);
   await save();
   const after = await snapshot(date);
@@ -26,22 +36,47 @@ export async function saveAndReport(date: string, save: () => Promise<unknown>):
   const lines = after.bonuses
     .filter((b) => !had.has(key(b)))
     .map((b) => {
-      const name = b.exerciseId ? after.exName.get(b.exerciseId) : '';
+      const name = b.exerciseId ? after.exMap.get(b.exerciseId)?.name : '';
       return `${BONUS_LABEL[b.type]}${name ? `（${name}）` : ''} +${fmtNum(b.xp)}`;
     });
 
   const gained = round1(after.total - before.total);
-  const title = `+${fmtNum(gained)} XP`;
+  const toast: ToastMessage = {
+    title: `+${fmtNum(gained)} XP`,
+    lines: [...lines, after.level.isMax ? 'レベル上限' : `次のレベルまで あと ${fmtNum(after.level.remaining)} XP`],
+  };
+
+  const celebrations: Celebration[] = [];
   if (after.level.level > before.level.level) {
-    return {
-      levelUp: true,
+    celebrations.push({
+      kind: 'level',
+      icon: '🆙',
+      label: 'LEVEL UP!',
       title: `Lv ${before.level.level} → Lv ${after.level.level}`,
-      lines: [
-        title,
-        ...lines,
-        ...(after.level.title !== before.level.title ? [`称号「${after.level.title}」になった！`] : []),
-      ],
-    };
+      lines: after.level.title !== before.level.title ? [`称号「${after.level.title}」になった！`] : [`称号「${after.level.title}」`],
+    });
   }
-  return { title, lines: [...lines, `次のレベルまで あと ${fmtNum(after.level.remaining)} XP`] };
+
+  const goalDone = new Set(before.goals.filter((g) => g.achieved).map((g) => g.goal.id));
+  for (const g of after.goals) {
+    if (g.achieved && !goalDone.has(g.goal.id)) {
+      celebrations.push({ kind: 'goal', icon: '🎉', label: '目標達成！', title: goalLabel(g.goal, after.exMap.get(g.goal.exerciseId)) });
+    }
+  }
+
+  const gotBefore = new Set(before.achievements.filter((a) => a.achieved).map((a) => a.def.id));
+  for (const a of after.achievements) {
+    if (a.achieved && !gotBefore.has(a.def.id)) {
+      celebrations.push({
+        kind: 'achievement',
+        icon: a.def.icon,
+        label: `実績解除（${TIER_LABEL[a.def.tier]}）`,
+        title: a.def.name,
+        lines: [a.def.condition],
+        tier: a.def.tier,
+      });
+    }
+  }
+
+  return { toast, celebrations };
 }
