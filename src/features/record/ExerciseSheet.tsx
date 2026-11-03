@@ -3,6 +3,8 @@ import { Sheet } from '../../components/Sheet';
 import { SetFields, draftFrom, draftToInput, type SetDraft } from '../../components/SetFields';
 import { useCelebrate, useToast } from '../../components/Toast';
 import { playFanfare, playSave, primeAudio } from '../../sound';
+import { RestTimerBar, useRestTimer } from '../../components/RestTimer';
+import { REST_FALLBACK } from '../../domain/defaults';
 import { addSets, lastValues, type LastValues } from '../../db/repo';
 import { formatShortDate } from '../../domain/date';
 import type { Exercise, SetRecord, Settings } from '../../domain/types';
@@ -36,6 +38,7 @@ export function ExerciseSheet({ date, exercise, settings, todaySets, onClose }: 
   const { bodyWeight, sound } = settings;
   const toast = useToast();
   const celebrate = useCelebrate();
+  const restTimer = useRestTimer();
   const [last, setLast] = useState<LastValues | null | undefined>(undefined);
   const [draft, setDraft] = useState<SetDraft>(() => draftFrom(null));
   const [sets, setSets] = useState(3);
@@ -70,6 +73,8 @@ export function ExerciseSheet({ date, exercise, settings, todaySets, onClose }: 
       toast(report.toast);
       celebrate(report.celebrations);
       if (sound) (report.celebrations.length ? playFanfare : playSave)();
+      // 保存・次のセットのどちらでも、その種目の休憩時間でタイマーを始める
+      restTimer.start(exercise.restSec ?? REST_FALLBACK, exercise.name, sound);
       if (close) onClose();
     } finally {
       setBusy(false);
@@ -80,6 +85,7 @@ export function ExerciseSheet({ date, exercise, settings, todaySets, onClose }: 
 
   return (
     <Sheet title={exercise.name} onClose={onClose}>
+      <RestTimerBar compact />
       <div className={styles.info}>
         {last === undefined ? (
           <span className="sub">読み込み中…</span>

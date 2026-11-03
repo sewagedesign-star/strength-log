@@ -34,6 +34,14 @@ export function playSave(): void {
   tone(1320, 0.07, 0.14);
 }
 
+/** 休憩終了：「ピッ・ピッ・ピー」 */
+export function playTimerEnd(): void {
+  if (ctx?.state === 'suspended') void ctx.resume();
+  tone(988, 0, 0.12, 'square', 0.08);
+  tone(988, 0.22, 0.12, 'square', 0.08);
+  tone(1318.5, 0.44, 0.45, 'square', 0.08);
+}
+
 /** レベルアップ・実績・目標達成：短いファンファーレ */
 export function playFanfare(): void {
   const notes = [523.25, 659.25, 783.99, 1046.5];
