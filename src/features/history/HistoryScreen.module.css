@@ -1,0 +1,121 @@
+.screen {
+  padding: 12px var(--gutter) 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.h1 {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.filters {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin: 0 calc(var(--gutter) * -1);
+  padding: 0 var(--gutter);
+}
+
+.filters > button {
+  flex-shrink: 0;
+  min-height: var(--tap);
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-weight: 700;
+}
+
+.filters > button.on {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--bg);
+}
+
+.day {
+  padding: 12px 12px 8px 16px;
+}
+
+.dayHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.date {
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.xp {
+  color: var(--xp);
+  font-weight: 800;
+}
+
+.group {
+  margin-top: 6px;
+}
+
+.exName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-sub);
+}
+
+.set {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--tap);
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  text-align: left;
+  padding: 0 4px;
+}
+
+.group .set:last-child {
+  border-bottom: none;
+}
+
+.setNo {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.setBody {
+  flex: 1;
+  font-weight: 600;
+}
+
+.note {
+  font-size: 14px;
+}
+
+.error {
+  margin-top: 8px;
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.actions > button {
+  min-height: 52px;
+}
