@@ -1,0 +1,227 @@
+.screen {
+  padding: 12px var(--gutter) 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.h1 {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.section {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.h2 {
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-sub);
+  margin-top: 6px;
+}
+
+.note {
+  margin-top: -4px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--tap);
+}
+
+.rowLabel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.hint {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-sub);
+}
+
+.rowField {
+  flex: 0 0 48%;
+}
+
+.numField {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.numField input {
+  text-align: right;
+}
+
+.unit {
+  flex: 0 0 2em;
+  color: var(--text-sub);
+  font-size: 14px;
+}
+
+.formula {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  font-size: 14px;
+}
+
+.wide {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.exRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  border-bottom: 1px solid var(--border);
+}
+
+.exRow:last-of-type {
+  border-bottom: none;
+}
+
+.exMain {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--tap);
+  border: none;
+  background: transparent;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.exName {
+  font-weight: 700;
+}
+
+.hidden .exName {
+  color: var(--text-sub);
+  text-decoration: line-through;
+}
+
+.toggle {
+  flex-shrink: 0;
+  width: 64px;
+  min-height: var(--tap);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-sub);
+}
+
+.toggleOn {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: #fff;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.formLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+
+.formLabel > :not(span) {
+  color: var(--text);
+}
+
+.choices {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 6px;
+}
+
+.choices > button {
+  min-height: var(--tap);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 0 4px;
+}
+
+.choices > button.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.actions > button {
+  min-height: 52px;
+}
+
+.error {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.goalRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--tap);
+  font-weight: 600;
+}
+
+.goalRow > span {
+  flex: 1;
+}
+
+.message {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.fileInput {
+  display: none;
+}
+
+.footer {
+  text-align: center;
+  padding: 8px 0;
+}
