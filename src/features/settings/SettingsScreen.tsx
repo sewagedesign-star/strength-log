@@ -6,6 +6,7 @@ import { useAllData, fmtNum } from '../../data';
 import { ExerciseSection } from './ExerciseSection';
 import { GoalSection } from './GoalSection';
 import { BackupSection } from './BackupSection';
+import { PlateSection } from './PlateSection';
 import { ConfirmDialog } from '../../components/Sheet';
 import styles from './Settings.module.css';
 
@@ -40,6 +41,7 @@ export function SettingsScreen() {
       </Section>
 
       <ExerciseSection exercises={data.exercises} />
+      <PlateSection settings={s} onSave={save} />
       <GoalSection goals={data.goals} exercises={data.exercises} />
 
       <Section title="XP係数" note="変えると、これまでの記録から累計XPを計算し直します">

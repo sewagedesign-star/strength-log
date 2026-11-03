@@ -150,8 +150,7 @@ export function RecordScreen() {
           key={open.id}
           date={today}
           exercise={open}
-          bodyWeight={data.settings.bodyWeight}
-          sound={data.settings.sound}
+          settings={data.settings}
           todaySets={todaySets.filter((s) => s.exerciseId === open.id)}
           onClose={() => setOpenId(null)}
         />

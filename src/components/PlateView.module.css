@@ -1,0 +1,53 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -2px 0 0 calc(3.2em + 10px);
+  min-height: 36px;
+}
+
+.pic {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 36px;
+}
+
+.sleeve {
+  width: 10px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--text-sub);
+}
+
+.plate {
+  width: 7px;
+  border-radius: 2px;
+}
+
+.collar {
+  width: 4px;
+  height: 10px;
+  border-radius: 1px;
+  background: var(--text-sub);
+}
+
+.text {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  display: flex;
+  flex-direction: column;
+}
+
+.warn {
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.note {
+  margin-left: calc(3.2em + 10px);
+  font-size: 14px;
+  color: var(--text-sub);
+}

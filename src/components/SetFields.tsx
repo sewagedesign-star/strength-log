@@ -1,6 +1,8 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import type { SetInput } from '../db/repo';
-import { CHIN_MODE_LABEL, RPES, type ChinMode, type Exercise, type Rpe } from '../domain/types';
+import { CHIN_MODE_LABEL, RPES, type ChinMode, type Exercise, type Rpe, type Settings } from '../domain/types';
+import { barTypeOf } from '../domain/plates';
+import { PlateView } from './PlateView';
 import { fmtNum } from '../data';
 import styles from './SetFields.module.css';
 
@@ -54,9 +56,12 @@ interface Props {
   bodyWeight: number;
   value: SetDraft;
   onChange: Dispatch<SetStateAction<SetDraft>>;
+  /** プレート計算用（バーベル・EZバー種目のとき） */
+  bars?: Settings['bars'];
 }
 
-export function SetFields({ exercise, bodyWeight, value, onChange }: Props) {
+export function SetFields({ exercise, bodyWeight, value, onChange, bars }: Props) {
+  const barType = barTypeOf(exercise.equipment);
   const [noteOpen, setNoteOpen] = useState(value.note !== '');
   const set = (p: Partial<SetDraft>) => onChange((d) => ({ ...d, ...p }));
   // 連続タップでも取りこぼさないよう、最新の値から増減する
@@ -98,13 +103,18 @@ export function SetFields({ exercise, bodyWeight, value, onChange }: Props) {
       ) : exercise.isBodyweight ? (
         <p className={styles.bw}>自重（体重 {fmtNum(bodyWeight)}kg）</p>
       ) : (
-        <Stepper
-          label="重量"
-          value={value.weight}
-          step={exercise.step}
-          onChange={(weight) => set({ weight })}
-          onBump={(dir) => bump('weight', dir)}
-        />
+        <>
+          <Stepper
+            label="重量"
+            value={value.weight}
+            step={exercise.step}
+            onChange={(weight) => set({ weight })}
+            onBump={(dir) => bump('weight', dir)}
+          />
+          {barType && bars && (
+            <PlateView weight={parseNum(value.weight)} bar={bars[barType]} label={barType === 'ezbar' ? 'EZバー' : 'バー'} />
+          )}
+        </>
       )}
 
       <label className={styles.row}>

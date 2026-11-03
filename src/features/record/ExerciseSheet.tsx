@@ -5,7 +5,7 @@ import { useCelebrate, useToast } from '../../components/Toast';
 import { playFanfare, playSave, primeAudio } from '../../sound';
 import { addSets, lastValues, type LastValues } from '../../db/repo';
 import { formatShortDate } from '../../domain/date';
-import type { Exercise, SetRecord } from '../../domain/types';
+import type { Exercise, SetRecord, Settings } from '../../domain/types';
 import { CHIN_MODE_LABEL } from '../../domain/types';
 import { fmtNum } from '../../data';
 import { saveAndReport } from './xpReport';
@@ -14,9 +14,7 @@ import styles from './ExerciseSheet.module.css';
 interface Props {
   date: string;
   exercise: Exercise;
-  bodyWeight: number;
-  /** 効果音を鳴らすか */
-  sound: boolean;
+  settings: Settings;
   /** 今日この種目で記録済みのセット */
   todaySets: SetRecord[];
   onClose: () => void;
@@ -34,7 +32,8 @@ export function setSummary(s: Pick<SetRecord, 'weight' | 'mode' | 'assistWeight'
   return `${load}×${s.reps} R${s.rpe}`;
 }
 
-export function ExerciseSheet({ date, exercise, bodyWeight, sound, todaySets, onClose }: Props) {
+export function ExerciseSheet({ date, exercise, settings, todaySets, onClose }: Props) {
+  const { bodyWeight, sound } = settings;
   const toast = useToast();
   const celebrate = useCelebrate();
   const [last, setLast] = useState<LastValues | null | undefined>(undefined);
@@ -105,7 +104,7 @@ export function ExerciseSheet({ date, exercise, bodyWeight, sound, todaySets, on
 
       {last !== undefined && (
         <>
-          <SetFields exercise={exercise} bodyWeight={bodyWeight} value={draft} onChange={setDraft} />
+          <SetFields exercise={exercise} bodyWeight={bodyWeight} value={draft} onChange={setDraft} bars={settings.bars} />
 
           <label className={styles.setsRow}>
             <span className={styles.label}>セット数</span>
