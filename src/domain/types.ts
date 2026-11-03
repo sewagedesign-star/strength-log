@@ -1,4 +1,5 @@
 // データモデル。XP・レベル・実績は保存せず、SetRecord から毎回計算する。
+import type { AvatarLook } from './avatar';
 
 export type Category = 'chest' | 'back' | 'armsShoulders' | 'legs' | 'other';
 export type Equipment = 'dumbbell' | 'ezbar' | 'rack' | 'barbell' | 'bodyweight';
@@ -114,6 +115,8 @@ export interface Settings {
   };
   /** 月のまとめを最後に自動で出した月（YYYY-MM） */
   monthlySeen?: string;
+  /** キャラの名前と見た目の好み（姿の段階・体つきは記録から計算） */
+  avatar?: Partial<AvatarLook>;
 }
 
 export type BarType = 'barbell' | 'ezbar';
