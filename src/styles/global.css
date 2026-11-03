@@ -67,6 +67,11 @@ body {
   height: 100%;
 }
 
+/* シートを開いている間は、後ろの画面をスクロールさせない */
+.modal-open main {
+  overflow: hidden !important;
+}
+
 button,
 input,
 select,

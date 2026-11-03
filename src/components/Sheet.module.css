@@ -1,16 +1,21 @@
+/* iPhone ではキーボードが出ても画面の高さが変わらないので、見えている範囲（--vv-*）に合わせる */
 .overlay {
   position: fixed;
-  inset: 0;
+  left: 0;
+  right: 0;
+  top: var(--vv-top, 0px);
+  height: var(--vv-height, 100dvh);
   z-index: 50;
   background: var(--overlay);
   display: flex;
   align-items: flex-end;
+  overscroll-behavior: contain;
   animation: fade 0.15s ease-out;
 }
 
 .sheet {
   width: 100%;
-  max-height: calc(100dvh - var(--safe-top) - 12px);
+  max-height: calc(var(--vv-height, 100dvh) - var(--safe-top) - 12px);
   display: flex;
   flex-direction: column;
   background: var(--bg);
@@ -53,8 +58,13 @@
   color: var(--text-sub);
 }
 
+/* シートの中だけでスクロールする（min-height: 0 がないと縮まずスクロールにならない） */
 .body {
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding: 4px var(--gutter) 0;
 }
 

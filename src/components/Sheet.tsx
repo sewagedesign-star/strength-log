@@ -16,6 +16,7 @@ export function Sheet({ title, onClose, children, center }: Props) {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
+  useModalLock();
 
   return (
     <div className={`${styles.overlay} ${center ? styles.center : ''}`} onClick={onClose}>
@@ -30,6 +31,39 @@ export function Sheet({ title, onClose, children, center }: Props) {
       </div>
     </div>
   );
+}
+
+let openCount = 0;
+
+/**
+ * シートを開いている間：
+ * - 後ろの画面をスクロールさせない（指の動きがシートの外へ逃げないように）
+ * - キーボードで狭くなった「見えている範囲」の高さを CSS 変数に入れる
+ */
+function useModalLock() {
+  useEffect(() => {
+    const root = document.documentElement;
+    const vv = window.visualViewport;
+    const fit = () => {
+      if (!vv) return;
+      root.style.setProperty('--vv-height', `${vv.height}px`);
+      root.style.setProperty('--vv-top', `${vv.offsetTop}px`);
+    };
+    openCount++;
+    root.classList.add('modal-open');
+    fit();
+    vv?.addEventListener('resize', fit);
+    vv?.addEventListener('scroll', fit);
+    return () => {
+      vv?.removeEventListener('resize', fit);
+      vv?.removeEventListener('scroll', fit);
+      if (--openCount === 0) {
+        root.classList.remove('modal-open');
+        root.style.removeProperty('--vv-height');
+        root.style.removeProperty('--vv-top');
+      }
+    };
+  }, []);
 }
 
 interface ConfirmProps {
