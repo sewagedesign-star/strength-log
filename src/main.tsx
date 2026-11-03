@@ -1,8 +1,9 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
-import App from './App';
+// 共通のスタイルは先に読み込む（各画面のスタイルで上書きできるように）
 import './styles/global.css';
+import App from './App';
 
 registerSW({ immediate: true });
 

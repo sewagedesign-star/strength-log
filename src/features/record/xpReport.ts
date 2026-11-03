@@ -2,6 +2,7 @@ import { loadAll } from '../../db/repo';
 import { TIER_LABEL, evaluateAchievements } from '../../domain/achievements';
 import { goalLabel, goalStatuses } from '../../domain/goals';
 import { levelFromXp } from '../../domain/level';
+import { avatarOf, stageFor } from '../../domain/avatar';
 import { BONUS_LABEL, computeXp, round1 } from '../../domain/xp';
 import type { Celebration, ToastMessage } from '../../components/Toast';
 import { fmtNum } from '../../data';
@@ -16,6 +17,7 @@ async function snapshot(date: string) {
     exMap: new Map(all.exercises.map((e) => [e.id, e])),
     goals: goalStatuses(all.goals, all.sets),
     achievements: evaluateAchievements(all.sets, all.sessions, all.exercises, all.settings, xp),
+    settings: all.settings,
   };
 }
 
@@ -48,12 +50,22 @@ export async function saveAndReport(date: string, save: () => Promise<unknown>):
 
   const celebrations: Celebration[] = [];
   if (after.level.level > before.level.level) {
+    // 称号が上がると演出の段階も上がる → 新しい姿のキャラを出す
+    const stageBefore = stageFor(before.level.level, after.settings);
+    const stageAfter = stageFor(after.level.level, after.settings);
+    const evolved = stageAfter > stageBefore;
+    const me = avatarOf(after.settings);
     celebrations.push({
       kind: 'level',
       icon: '🆙',
-      label: 'LEVEL UP!',
+      label: evolved ? 'LEVEL UP!  進化！' : 'LEVEL UP!',
       title: `Lv ${before.level.level} → Lv ${after.level.level}`,
-      lines: after.level.title !== before.level.title ? [`称号「${after.level.title}」になった！`] : [`称号「${after.level.title}」`],
+      lines: evolved
+        ? [`${me.name}が「${after.level.title}」になった！`]
+        : after.level.title !== before.level.title
+          ? [`称号「${after.level.title}」になった！`]
+          : [`称号「${after.level.title}」`],
+      avatar: evolved ? { character: me.character, stage: stageAfter } : undefined,
     });
   }
 

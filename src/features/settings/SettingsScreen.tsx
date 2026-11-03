@@ -2,7 +2,11 @@ import { useState, type ReactNode } from 'react';
 import { DEFAULT_SETTINGS } from '../../domain/defaults';
 import { RPES, type Settings } from '../../domain/types';
 import { saveSettings } from '../../db/repo';
-import { useAllData, fmtNum } from '../../data';
+import { useAllData, useXp, fmtNum } from '../../data';
+import { CharacterFace } from '../../components/CharacterCard';
+import { CharacterPicker } from '../character/CharacterPicker';
+import { avatarOf, stageFor } from '../../domain/avatar';
+import { levelFromXp } from '../../domain/level';
 import { ExerciseSection } from './ExerciseSection';
 import { GoalSection } from './GoalSection';
 import { BackupSection } from './BackupSection';
@@ -12,14 +16,29 @@ import styles from './Settings.module.css';
 
 export function SettingsScreen() {
   const data = useAllData();
+  const xp = useXp(data);
   const [confirmReset, setConfirmReset] = useState(false);
-  if (!data) return null;
+  const [picking, setPicking] = useState(false);
+  if (!data || !xp) return null;
   const s = data.settings;
   const save = (p: Partial<Settings>) => saveSettings({ ...s, ...p });
+  const me = avatarOf(s);
+  const stage = stageFor(levelFromXp(xp.total, s).level, s);
 
   return (
     <div className={styles.screen}>
       <h1 className={styles.h1}>設定</h1>
+
+      <Section title="キャラ">
+        <div className={styles.charRow}>
+          <CharacterFace character={me.character} size={56} />
+          <span className={styles.charName}>{me.name}</span>
+          <button type="button" className="btn" onClick={() => setPicking(true)}>
+            選ぶ・名前
+          </button>
+        </div>
+      </Section>
+      {picking && <CharacterPicker settings={s} stage={stage} onClose={() => setPicking(false)} />}
 
       <Section title="からだ">
         <Row label="体重" hint="自重種目のXP計算に使います">

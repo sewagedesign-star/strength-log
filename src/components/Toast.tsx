@@ -1,4 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import type { CharacterDef } from '../domain/avatar';
+import { CharacterCard } from './CharacterCard';
 import styles from './Toast.module.css';
 
 export interface ToastMessage {
@@ -15,6 +17,8 @@ export interface Celebration {
   title: string;
   lines?: string[];
   tier?: 'bronze' | 'silver' | 'gold';
+  /** 進化したとき：アイコンの代わりにキャラを新しい演出で出す */
+  avatar?: { character: CharacterDef; stage: number };
 }
 
 const ToastContext = createContext<(m: ToastMessage) => void>(() => {});
@@ -70,9 +74,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               aria-label={`${cur.label} ${cur.title}`}
             >
               <div className={styles.label}>{cur.label}</div>
-              <div className={styles.icon} aria-hidden="true">
-                {cur.icon}
-              </div>
+              {cur.avatar ? (
+                <CharacterCard character={cur.avatar.character} stage={cur.avatar.stage} className={styles.avatar} />
+              ) : (
+                <div className={styles.icon} aria-hidden="true">
+                  {cur.icon}
+                </div>
+              )}
               <div className={styles.cardTitle}>{cur.title}</div>
               {cur.lines?.map((l) => (
                 <div key={l} className={styles.cardLine}>

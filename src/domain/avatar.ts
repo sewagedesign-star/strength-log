@@ -1,42 +1,44 @@
-// キャラの見た目。姿の段階・体つきは記録（累計XP）から毎回計算し、保存するのは見た目の好みだけ。
-import type { Category, Settings } from './types';
+// キャラ。6人から1人を選ぶ。称号（レベル）が上がると、キャラの周りの演出（背景・枠・オーラ）が変わる。
+// 絵はユーザーが用意した画像（public/characters）。保存するのは選んだキャラと名前だけ。
+import type { Settings } from './types';
 
-export type HairStyle = 'short' | 'bob' | 'long' | 'twin';
-export const HAIR_STYLES: HairStyle[] = ['short', 'bob', 'long', 'twin'];
-export const HAIR_STYLE_LABEL: Record<HairStyle, string> = { short: 'ショート', bob: 'ボブ', long: 'ロング', twin: 'ツインテール' };
-
-export const HAIR_COLORS = ['#f26fb3', '#7ccf4a', '#3fa9f5', '#9b6bd6', '#e2483d', '#f2cc6b', '#d9dbe8', '#8a5a3c', '#2e2a3a'];
-export const SKIN_COLORS = ['#ffe6d8', '#f9d2b8', '#e2a77f', '#9c6646'];
-export const EYE_COLORS = ['#3a8ee6', '#3cb371', '#e04848', '#9b59d0', '#e0a030', '#8b5a2b'];
-export const OUTFIT_COLORS = ['#e24a4a', '#3a7bd5', '#2f9e6a', '#f08a24', '#e86aa6', '#2c2c38', '#f4f4f6'];
-
-export interface AvatarLook {
-  name: string;
-  hairStyle: HairStyle;
-  hairColor: string;
-  skin: string;
-  eye: string;
-  outfit: string;
+export interface CharacterDef {
+  id: string;
+  /** public/ からの画像のパス */
+  file: string;
+  defaultName: string;
+  /** 画像の幅÷高さ */
+  aspect: number;
+  /** 顔の位置（画像の幅・高さに対する割合）。丸く顔だけ出すときに使う */
+  face: { cx: number; cy: number; size: number };
 }
 
-export const DEFAULT_LOOK: AvatarLook = {
-  name: 'ルーキー',
-  hairStyle: 'short',
-  hairColor: HAIR_COLORS[2],
-  skin: SKIN_COLORS[0],
-  eye: EYE_COLORS[0],
-  outfit: OUTFIT_COLORS[0],
-};
+const c = (n: number, defaultName: string, w: number, h: number, cx: number): CharacterDef => ({
+  id: `char${n}`,
+  file: `characters/char${n}.webp`,
+  defaultName,
+  aspect: w / h,
+  face: { cx, cy: 0.088, size: 0.2 },
+});
+
+export const CHARACTERS: CharacterDef[] = [
+  c(1, 'ハヤト', 347, 921, 0.545),
+  c(2, 'サクラ', 352, 870, 0.508),
+  c(3, 'ゴウ', 358, 938, 0.504),
+  c(4, 'ミミ', 334, 839, 0.497),
+  c(5, 'レン', 313, 925, 0.459),
+  c(6, 'シズク', 302, 867, 0.515),
+];
 
 /** 姿の段階（0〜5）。称号の区切り（Lv1・10・20・35・50・70）に合わせる */
 export const STAGE_COUNT = 6;
-export const STAGE_INFO: { outfit: string; place: string }[] = [
-  { outfit: 'Tシャツと短パン', place: '自分の部屋' },
-  { outfit: 'タンクトップとハチマキ', place: '朝の公園' },
-  { outfit: 'リストバンドとグローブ', place: 'ジム' },
-  { outfit: 'パワーベルトと青いオーラ', place: '闘技場' },
-  { outfit: '道着とマント、赤いオーラ', place: '山の頂上' },
-  { outfit: '金のオーラと王冠', place: '星空' },
+export const STAGE_INFO: { frame: string; place: string; effect: string }[] = [
+  { frame: 'なし', place: '自分の部屋', effect: '' },
+  { frame: '銅', place: '朝の公園', effect: '' },
+  { frame: '銀', place: 'ジム', effect: 'キラキラ' },
+  { frame: '金', place: '闘技場', effect: '青いオーラ' },
+  { frame: '金', place: '山の頂上', effect: '赤いオーラ' },
+  { frame: '虹', place: '星空', effect: '金のオーラと王冠' },
 ];
 
 export function stageFor(level: number, settings: Settings): number {
@@ -54,34 +56,13 @@ export function stageMinLevel(stage: number, settings: Settings): number {
   return mins[stage] ?? mins[mins.length - 1];
 }
 
-export interface Physique {
-  arms: number;
-  chest: number;
-  back: number;
-  legs: number;
+/** 選んでいるキャラと、その名前 */
+export function avatarOf(settings: Settings): { character: CharacterDef; name: string } {
+  const character = CHARACTERS.find((ch) => ch.id === settings.avatar?.characterId) ?? CHARACTERS[0];
+  const name = settings.avatar?.names?.[character.id]?.trim() || character.defaultName;
+  return { character, name };
 }
 
-/** 体つきが最大になるレベル */
-export const FULL_GROWTH_LEVEL = 70;
-/** 一番鍛えた部位の最大の太さ（1 が初期） */
-export const MAX_SCALE = 1.6;
-
-/**
- * 部位のXPから体つきを決める（1.0〜1.6）。
- * レベルが上がるほど全体が育ち、よく鍛えた部位ほど太くなる。鍛えていない部位も少しは育つ（4割）。
- */
-export function physique(byCategory: Record<Category, number>, level: number): Physique {
-  const t = Math.min(1, Math.max(0, (level - 1) / (FULL_GROWTH_LEVEL - 1)));
-  const parts = { arms: byCategory.armsShoulders, chest: byCategory.chest, back: byCategory.back, legs: byCategory.legs };
-  const top = Math.max(...Object.values(parts));
-  const grow = (xp: number) => {
-    const share = top > 0 ? xp / top : 0;
-    return Math.round((1 + (MAX_SCALE - 1) * t * (0.4 + 0.6 * share)) * 1000) / 1000;
-  };
-  return { arms: grow(parts.arms), chest: grow(parts.chest), back: grow(parts.back), legs: grow(parts.legs) };
-}
-
-/** 保存された好みに、足りない項目の既定値を補う */
-export function lookOf(settings: Settings): AvatarLook {
-  return { ...DEFAULT_LOOK, ...settings.avatar };
+export function characterById(id: string | undefined): CharacterDef {
+  return CHARACTERS.find((ch) => ch.id === id) ?? CHARACTERS[0];
 }

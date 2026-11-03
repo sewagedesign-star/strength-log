@@ -225,6 +225,18 @@
   display: none;
 }
 
+.charRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.charName {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 800;
+}
+
 .footer {
   text-align: center;
   padding: 8px 0;

@@ -7,12 +7,16 @@ import { BODY_PARTS, CATEGORY_LABEL, type Category } from '../../domain/types';
 import { fmtNum, useAllData, useXp } from '../../data';
 import { evaluateAchievements } from '../../domain/achievements';
 import { Achievements } from './Achievements';
+import { CharacterCard } from '../../components/CharacterCard';
+import { CharacterPicker } from './CharacterPicker';
+import { STAGE_COUNT, STAGE_INFO, avatarOf, stageFor, stageMinLevel } from '../../domain/avatar';
 import styles from './CharacterScreen.module.css';
 
 export function CharacterScreen() {
   const data = useAllData();
   const xp = useXp(data);
   const [showMonthly, setShowMonthly] = useState(false);
+  const [picking, setPicking] = useState(false);
 
   const weekDays = useMemo(() => {
     if (!xp) return 0;
@@ -35,8 +39,22 @@ export function CharacterScreen() {
   const done = goals.filter((g) => g.achieved);
   const questDays = data.settings.bonus.weeklyDays;
 
+  const stage = stageFor(lv.level, data.settings);
+  const me = avatarOf(data.settings);
+
   return (
     <div className={styles.screen}>
+      <section className={styles.avatar}>
+        <CharacterCard character={me.character} stage={stage} label={`${me.name}（${lv.title}）`} className={styles.avatarCard} />
+        <div className={styles.nameRow}>
+          <span className={styles.charName}>{me.name}</span>
+          <button type="button" className="btn" onClick={() => setPicking(true)}>
+            キャラを変える
+          </button>
+        </div>
+      </section>
+      {picking && <CharacterPicker settings={data.settings} stage={stage} onClose={() => setPicking(false)} />}
+
       <section className={`card ${styles.hero}`}>
         <div className={styles.lvRow}>
           <span className={styles.lv}>
@@ -97,6 +115,29 @@ export function CharacterScreen() {
       <section className={`card ${styles.block}`}>
         <h2 className={styles.h2}>部位ステータス</h2>
         <Radar values={xp.byCategory} />
+      </section>
+
+      <section className={`card ${styles.block}`}>
+        <h2 className={styles.h2}>進化の図鑑</h2>
+        <ul className={styles.dex}>
+          {Array.from({ length: STAGE_COUNT }, (_, i) => {
+            const locked = i > stage;
+            const t = data.settings.titles[i];
+            return (
+              <li key={i} className={i === stage ? styles.dexNow : ''}>
+                <CharacterCard
+                  character={me.character}
+                  stage={i}
+                  small
+                  silhouette={locked}
+                  label={locked ? `まだの姿（Lv${stageMinLevel(i, data.settings)}から）` : `${t?.name ?? ''}の姿`}
+                />
+                <span className={styles.dexName}>{t?.name}</span>
+                <span className="sub">{locked ? `Lv${stageMinLevel(i, data.settings)}〜` : STAGE_INFO[i].place}</span>
+              </li>
+            );
+          })}
+        </ul>
       </section>
 
       <section className={`card ${styles.block}`}>

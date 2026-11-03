@@ -7,6 +7,8 @@ import { CATEGORIES, CATEGORY_LABEL, type Category } from '../../domain/types';
 import { useAllData, useXp } from '../../data';
 import { ExerciseSheet, setSummary } from './ExerciseSheet';
 import { BackupBanner } from './BackupBanner';
+import { CharacterFace } from '../../components/CharacterCard';
+import { avatarOf } from '../../domain/avatar';
 import styles from './RecordScreen.module.css';
 
 /** 日付が変わったら（日をまたいで開きっぱなしでも）今日に追従する */
@@ -68,9 +70,12 @@ export function RecordScreen() {
             {prev ? `${prev.categories.map((c) => CATEGORY_LABEL[c]).join('・')}（${formatShortDate(prev.date)}）` : 'まだ記録がありません'}
           </p>
         </div>
-        <div className={styles.level}>
-          <span className={styles.lv}>Lv {level.level}</span>
-          <span className={styles.title}>{level.title}</span>
+        <div className={styles.me}>
+          <div className={styles.level}>
+            <span className={styles.lv}>Lv {level.level}</span>
+            <span className={styles.title}>{level.title}</span>
+          </div>
+          <CharacterFace character={avatarOf(data.settings).character} size={44} />
         </div>
       </header>
 

@@ -36,7 +36,7 @@ workout-app/
   README.md               … 公開URL・使い方
   vite.config.ts          … PWA 設定を含む（base は /strength-log/）
   vitest.config.ts
-  public/                 … アイコン（scripts/make-icons.mjs で作る）
+  public/                 … アイコン（scripts/make-icons.mjs で作る）、characters/（キャラ6人の画像）
   src/
     main.tsx / App.tsx    … タブ切替
     data.ts               … useAllData / useXp（全画面共通の読み込み）
@@ -52,6 +52,7 @@ workout-app/
       stats.ts            … グラフ用の集計（種目ごとの推移・週ごとのXP）
       achievements.ts     … 実績（バッジ）の定義と判定
       plates.ts / monthly.ts / backupReminder.ts … プレート計算・月のまとめ・バックアップのお知らせ判定
+      avatar.ts           … キャラ6人の定義・演出の段階・選んだキャラと名前
       *.test.ts           … Vitest（domain は全関数テスト）
     db/
       db.ts               … Dexie のスキーマとバージョン、初回の初期データ投入
@@ -102,6 +103,14 @@ workout-app/
 - プレート計算：バーベルと EZバー。プレートは一般的な組み合わせを枚数制限なしで仮置き（設定で枚数・バーの重さを変更）。
   EZバー本体の重さ 10kg は仮の値。最初からあるバーベル種目の刻みは 2.5kg（DB v2 の更新で変更）。
 - バックアップのお知らせ：最後の書き出しから30日（設定で変更）。一度も書き出していなければ最初の記録から7日。「あとで」で7日出さない。
+
+## フェーズ4で決めたこと（A2 キャラの見た目が育つ）
+- 図形で描いたキャラは「可愛くない」とのことで、**ユーザーが Gemini で作ったオリジナルの6人の画像**を使う（公開してよいとユーザー確認済み）。
+  白背景の元画像から1人ずつ切り抜いて背景を透明にし、`public/characters/char1〜6.webp` に置いた（各30KB前後）。
+- 6人から1人を選ぶ（仮の名前：ハヤト・サクラ・ゴウ・ミミ・レン・シズク。キャラごとに名前を変えられる。settings.avatar）。
+- 称号（6段階）が上がると、キャラの周りの演出が変わる（背景・枠 銅/銀/金/虹・オーラ・キラキラ・王冠）。絵そのものは変わらない。
+  進化の図鑑で、まだの段階は影で見せる。称号が上がったときはお祝いカードに新しい演出のキャラを出す。記録画面の右上に顔を丸く出す。
+- 部位ごとの体つきの変化（2A）と髪型・色の選択（5B）は、画像を使うためやめた（ユーザー了承）。
 
 ## GitHub・公開
 - リポジトリ：`sewagedesign-star/strength-log`（Public）。手元のフォルダ名は workout-app のまま。
