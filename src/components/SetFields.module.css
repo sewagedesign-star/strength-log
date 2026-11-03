@@ -1,0 +1,119 @@
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.label {
+  flex: 0 0 3.2em;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+
+.stepper {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 64px 1fr 64px;
+  gap: 8px;
+}
+
+.stepper > button {
+  height: 56px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.stepper > button:active {
+  background: var(--accent-soft);
+}
+
+.numWrap {
+  position: relative;
+}
+
+.num {
+  width: 100%;
+  height: 56px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  text-align: center;
+  font-size: 28px !important;
+  font-weight: 800;
+  padding: 0 2.2em 0 0.4em;
+}
+
+.unit {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-sub);
+  pointer-events: none;
+}
+
+.bw {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  color: var(--text-sub);
+  font-weight: 600;
+}
+
+.segment,
+.rpe {
+  flex: 1;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 6px;
+}
+
+.segment > button,
+.rpe > button {
+  min-height: var(--tap);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-weight: 700;
+}
+
+.rpe > button {
+  min-height: 48px;
+  font-size: 18px;
+}
+
+.segment > button.on,
+.rpe > button.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.noteToggle {
+  align-self: flex-start;
+  min-height: var(--tap);
+  border: none;
+  background: transparent;
+  color: var(--text-sub);
+  padding: 0 4px;
+}
+
+.note {
+  padding: 10px 12px;
+  resize: none;
+}

@@ -1,0 +1,56 @@
+.toast {
+  position: fixed;
+  z-index: 100;
+  left: var(--gutter);
+  right: var(--gutter);
+  top: calc(var(--safe-top) + 12px);
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--text);
+  color: var(--bg);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  animation: drop 0.25s ease-out;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.line {
+  font-size: 15px;
+  opacity: 0.9;
+}
+
+.levelUp {
+  background: linear-gradient(135deg, #6b4de6, #e8661c);
+  color: #fff;
+  padding: 20px 16px;
+  animation: pop 0.45s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+.levelUp .title {
+  font-size: 26px;
+}
+
+.badge {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  margin-bottom: 4px;
+}
+
+@keyframes drop {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
