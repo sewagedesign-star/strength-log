@@ -1,4 +1,5 @@
 import type { Exercise, Goal, Session, SetRecord, Settings } from '../domain/types';
+import { DEFAULT_REST, REST_FALLBACK } from '../domain/defaults';
 import { db as defaultDb, type WorkoutDb } from './db';
 import { loadAll } from './repo';
 
@@ -48,7 +49,10 @@ export async function importBackup(b: BackupFile, d: WorkoutDb = defaultDb): Pro
     let skipped = 0;
 
     const exIds = new Set(await d.exercises.toCollection().primaryKeys());
-    const newEx = b.exercises.filter((e) => !exIds.has(e.id));
+    // 古いバックアップの種目には休憩時間がないので補う
+    const newEx = b.exercises
+      .filter((e) => !exIds.has(e.id))
+      .map((e) => ({ ...e, restSec: e.restSec ?? DEFAULT_REST[e.id] ?? REST_FALLBACK }));
     skipped += b.exercises.length - newEx.length;
     await d.exercises.bulkAdd(newEx);
     added.exercises = newEx.length;

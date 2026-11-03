@@ -47,6 +47,8 @@ export interface Exercise {
   bodyweightRatio: number;
   /** 重量の刻み（kg） */
   step: number;
+  /** セット間の休憩時間（秒） */
+  restSec: number;
   visible: boolean;
   isCustom: boolean;
   order: number;
@@ -100,6 +102,33 @@ export interface Settings {
   titles: TitleRule[];
   /** 保存・実績のときに効果音を鳴らす */
   sound: boolean;
+  /** バー（バーベル・EZバー）の重さと持っているプレート */
+  bars: Record<BarType, BarSetup>;
+  backup: {
+    /** 最後に JSON を書き出した時刻 */
+    lastExportAt?: number;
+    /** 「あとで」を押したときの、お知らせを出さない期限 */
+    snoozeUntil?: number;
+    /** お知らせを出すまでの日数 */
+    intervalDays: number;
+  };
+  /** 月のまとめを最後に自動で出した月（YYYY-MM） */
+  monthlySeen?: string;
+}
+
+export type BarType = 'barbell' | 'ezbar';
+
+export interface Plate {
+  /** 1枚の重さ（kg） */
+  weight: number;
+  /** 持っている枚数。null は制限なし */
+  count: number | null;
+}
+
+export interface BarSetup {
+  /** バーだけの重さ（kg） */
+  weight: number;
+  plates: Plate[];
 }
 
 /** 種目目標。weight を指定すれば重量×回数、mode を指定すればチンニングのやり方×回数 */

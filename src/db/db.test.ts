@@ -1,5 +1,6 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import Dexie from 'dexie';
 import { WorkoutDb } from './db';
 import { addSets, getSettings, lastSessionBefore, lastValues, loadAll, saveSettings, setMenu } from './repo';
 import { exportBackup, importBackup, parseBackup } from './backup';
@@ -18,12 +19,43 @@ afterEach(async () => {
 const input = { weight: 20, reps: 10, rpe: 8 as const, note: '' };
 
 describe('初期データ', () => {
-  it('種目マスタ・目標・設定が入る（体重79kg、刻み1kg）', async () => {
+  it('種目マスタ・目標・設定が入る（体重79kg、刻み1kg、バーベルは2.5kg）', async () => {
     const all = await loadAll(d);
     expect(all.exercises).toHaveLength(DEFAULT_EXERCISES.length);
     expect(all.goals).toHaveLength(DEFAULT_GOALS.length);
     expect(all.settings.bodyWeight).toBe(79);
-    expect(all.exercises.every((e) => e.step === 1)).toBe(true);
+    expect(all.exercises.every((e) => e.step === (e.equipment === 'barbell' ? 2.5 : 1))).toBe(true);
+    expect(all.exercises.every((e) => e.restSec > 0)).toBe(true);
+  });
+});
+
+describe('古いデータからの更新（v1 → v2）', () => {
+  it('種目に休憩時間が入り、最初からあるバーベル種目は 2.5kg 刻みになる', async () => {
+    const name = `old-${n}`;
+    const old = new Dexie(name);
+    old.version(1).stores({ exercises: 'id, category, equipment, order', sessions: 'id, &date', sets: 'id, sessionId, exerciseId, createdAt', goals: 'id, exerciseId, order', settings: 'id' });
+    await old.table('exercises').bulkAdd([
+      { ...DEFAULT_EXERCISES.find((e) => e.id === 'bench-press'), step: 1, restSec: undefined },
+      { ...DEFAULT_EXERCISES.find((e) => e.id === 'db-curl'), step: 1, restSec: undefined },
+      { id: 'my-bb', name: '自分の種目', category: 'back', equipment: 'barbell', step: 1, isCustom: true, order: 99 },
+    ]);
+    old.close();
+
+    const upgraded = new WorkoutDb(name);
+    const ex = Object.fromEntries((await upgraded.exercises.toArray()).map((e) => [e.id, e]));
+    expect(ex['bench-press']).toMatchObject({ step: 2.5, restSec: 180 });
+    expect(ex['db-curl']).toMatchObject({ step: 1, restSec: 60 });
+    expect(ex['my-bb']).toMatchObject({ step: 1, restSec: 90 }); // 自分で作った種目の刻みは変えない
+    await upgraded.delete();
+  });
+
+  it('古い設定にも新しい項目の既定値が入る', async () => {
+    await d.settings.put({ id: 'main', bodyWeight: 70 } as never);
+    const s = await getSettings(d);
+    expect(s.bodyWeight).toBe(70);
+    expect(s.bars.barbell.weight).toBe(20);
+    expect(s.backup.intervalDays).toBe(30);
+    expect(s.sound).toBe(true);
   });
 });
 

@@ -36,6 +36,8 @@ export function withDefaults(s: Partial<Settings> | undefined): Settings {
     bonus: { ...DEFAULT_SETTINGS.bonus, ...s?.bonus },
     level: { ...DEFAULT_SETTINGS.level, ...s?.level },
     titles: s?.titles?.length ? s.titles : DEFAULT_SETTINGS.titles,
+    bars: { ...DEFAULT_SETTINGS.bars, ...s?.bars },
+    backup: { ...DEFAULT_SETTINGS.backup, ...s?.backup },
   };
 }
 

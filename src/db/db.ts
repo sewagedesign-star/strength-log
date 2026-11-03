@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie';
-import { DEFAULT_EXERCISES, DEFAULT_GOALS, DEFAULT_SETTINGS } from '../domain/defaults';
+import { DEFAULT_EXERCISES, DEFAULT_GOALS, DEFAULT_REST, DEFAULT_SETTINGS, REST_FALLBACK } from '../domain/defaults';
 import type { Exercise, Goal, Session, SetRecord, Settings } from '../domain/types';
 
 export class WorkoutDb extends Dexie {
@@ -18,6 +18,18 @@ export class WorkoutDb extends Dexie {
       goals: 'id, exerciseId, order',
       settings: 'id',
     });
+    // v2：種目に休憩時間を追加。最初からある バーベル種目の刻みを 1kg → 2.5kg に
+    this.version(2)
+      .stores({})
+      .upgrade((tx) =>
+        tx
+          .table('exercises')
+          .toCollection()
+          .modify((e: Exercise) => {
+            if (e.restSec == null) e.restSec = DEFAULT_REST[e.id] ?? REST_FALLBACK;
+            if (!e.isCustom && e.equipment === 'barbell' && e.step === 1) e.step = 2.5;
+          }),
+      );
     // 初回だけ初期データを入れる
     this.on('populate', (tx) => {
       tx.table('exercises').bulkAdd(DEFAULT_EXERCISES);
