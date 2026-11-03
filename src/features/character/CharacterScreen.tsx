@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { MonthlyBrowser } from './MonthlySummary';
 import { formatShortDate, toDateKey, weekStart } from '../../domain/date';
 import { goalLabel, goalStatuses } from '../../domain/goals';
 import { levelFromXp } from '../../domain/level';
@@ -11,6 +12,7 @@ import styles from './CharacterScreen.module.css';
 export function CharacterScreen() {
   const data = useAllData();
   const xp = useXp(data);
+  const [showMonthly, setShowMonthly] = useState(false);
 
   const weekDays = useMemo(() => {
     if (!xp) return 0;
@@ -50,6 +52,11 @@ export function CharacterScreen() {
           <span>{lv.isMax ? 'レベル上限' : `次のレベルまで あと ${fmtNum(lv.remaining)} XP`}</span>
         </div>
       </section>
+
+      <button type="button" className={`btn ${styles.monthly}`} onClick={() => setShowMonthly(true)}>
+        📊 月のまとめを見る
+      </button>
+      {showMonthly && <MonthlyBrowser data={data} xp={xp} onClose={() => setShowMonthly(false)} />}
 
       <section className={`card ${styles.block}`}>
         <h2 className={styles.h2}>週間クエスト</h2>
