@@ -1,0 +1,155 @@
+.screen {
+  padding: 12px var(--gutter) 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.date {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.level {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.lv {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--xp);
+}
+
+.title {
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.cats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.cats > button {
+  min-height: var(--tap);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
+.cats > button.on {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--bg);
+}
+
+.hint {
+  padding: 4px 2px;
+}
+
+.checks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--tap);
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  text-align: left;
+  font-size: 15px;
+}
+
+.checked {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.box {
+  flex: 0 0 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid var(--border);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.checked .box {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.checkName {
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menuTitle {
+  font-size: 16px;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 8px 12px 8px 16px;
+  border: none;
+  text-align: left;
+}
+
+.itemName {
+  flex: 1;
+  font-weight: 700;
+  min-width: 0;
+}
+
+.itemState {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.done {
+  color: var(--ok);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.chev {
+  font-size: 24px;
+  color: var(--text-sub);
+}

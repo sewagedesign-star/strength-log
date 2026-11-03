@@ -1,0 +1,59 @@
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.today {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  font-size: 13px;
+}
+
+.setsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.label {
+  flex: 0 0 3.2em;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+
+.error {
+  margin-top: 8px;
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.actions > button {
+  min-height: 60px;
+  line-height: 1.25;
+  font-size: 15px;
+}
+
+.save {
+  font-size: 18px !important;
+}
