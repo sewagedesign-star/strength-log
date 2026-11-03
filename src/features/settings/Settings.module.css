@@ -133,6 +133,10 @@
   color: var(--text-sub);
 }
 
+.toggleWide {
+  width: 100%;
+}
+
 .toggleOn {
   background: var(--ok);
   border-color: var(--ok);

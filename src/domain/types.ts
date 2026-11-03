@@ -98,6 +98,8 @@ export interface Settings {
   /** Lv n → n+1 に必要なXP = base + perLevel × n */
   level: { base: number; perLevel: number; max: number };
   titles: TitleRule[];
+  /** 保存・実績のときに効果音を鳴らす */
+  sound: boolean;
 }
 
 /** 種目目標。weight を指定すれば重量×回数、mode を指定すればチンニングのやり方×回数 */

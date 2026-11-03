@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Sheet } from '../../components/Sheet';
 import { SetFields, draftFrom, draftToInput, type SetDraft } from '../../components/SetFields';
-import { useToast } from '../../components/Toast';
+import { useCelebrate, useToast } from '../../components/Toast';
+import { playFanfare, playSave, primeAudio } from '../../sound';
 import { addSets, lastValues, type LastValues } from '../../db/repo';
 import { formatShortDate } from '../../domain/date';
 import type { Exercise, SetRecord } from '../../domain/types';
@@ -14,6 +15,8 @@ interface Props {
   date: string;
   exercise: Exercise;
   bodyWeight: number;
+  /** 効果音を鳴らすか */
+  sound: boolean;
   /** 今日この種目で記録済みのセット */
   todaySets: SetRecord[];
   onClose: () => void;
@@ -31,8 +34,9 @@ export function setSummary(s: Pick<SetRecord, 'weight' | 'mode' | 'assistWeight'
   return `${load}×${s.reps} R${s.rpe}`;
 }
 
-export function ExerciseSheet({ date, exercise, bodyWeight, todaySets, onClose }: Props) {
+export function ExerciseSheet({ date, exercise, bodyWeight, sound, todaySets, onClose }: Props) {
   const toast = useToast();
+  const celebrate = useCelebrate();
   const [last, setLast] = useState<LastValues | null | undefined>(undefined);
   const [draft, setDraft] = useState<SetDraft>(() => draftFrom(null));
   const [sets, setSets] = useState(3);
@@ -61,9 +65,12 @@ export function ExerciseSheet({ date, exercise, bodyWeight, todaySets, onClose }
     }
     setError('');
     setBusy(true);
+    if (sound) primeAudio(); // iPhone では押した瞬間に音の準備が必要
     try {
-      const msg = await saveAndReport(date, () => addSets(date, exercise.id, input, count));
-      toast(msg);
+      const report = await saveAndReport(date, () => addSets(date, exercise.id, input, count));
+      toast(report.toast);
+      celebrate(report.celebrations);
+      if (sound) (report.celebrations.length ? playFanfare : playSave)();
       if (close) onClose();
     } finally {
       setBusy(false);

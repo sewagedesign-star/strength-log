@@ -26,6 +26,19 @@ export function SettingsScreen() {
         </Row>
       </Section>
 
+      <Section title="音">
+        <Row label="効果音" hint="保存・レベルアップ・実績のときに鳴らします（マナーモードでは鳴らないことがあります）">
+          <button
+            type="button"
+            className={`${styles.toggle} ${styles.toggleWide} ${s.sound ? styles.toggleOn : ''}`}
+            aria-pressed={s.sound}
+            onClick={() => save({ sound: !s.sound })}
+          >
+            {s.sound ? '鳴らす' : '鳴らさない'}
+          </button>
+        </Row>
+      </Section>
+
       <ExerciseSection exercises={data.exercises} />
       <GoalSection goals={data.goals} exercises={data.exercises} />
 

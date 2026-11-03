@@ -15,6 +15,7 @@ export const DEFAULT_SETTINGS: Settings = {
     { minLevel: 50, name: '達人' },
     { minLevel: 70, name: '伝説' },
   ],
+  sound: true,
 };
 
 type Seed = Pick<Exercise, 'id' | 'name' | 'category' | 'equipment'> & Partial<Exercise>;
