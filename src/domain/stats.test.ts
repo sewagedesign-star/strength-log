@@ -85,10 +85,15 @@ describe('週ごとのXP', () => {
     expect(w.reduce((a, x) => a + x.total, 0)).toBe(xp.total);
   });
 
-  it('記録のない週も0で埋め、今日の週まで出す', () => {
+  it('記録の始まる前の週は出さず、今日の週まで記録のない週も0で埋める', () => {
     const w = weeklyXp(sets, sessions, DEFAULT_EXERCISES, S, xp, '2026-10-20', '2026-11-25');
-    expect(w.map((x) => x.week)).toEqual(['2026-10-19', '2026-10-26', '2026-11-02', '2026-11-09', '2026-11-16', '2026-11-23']);
-    expect(w[0].total).toBe(0);
+    expect(w.map((x) => x.week)).toEqual(['2026-11-02', '2026-11-09', '2026-11-16', '2026-11-23']);
+    expect(w[3].total).toBe(0);
+  });
+
+  it('期間の始まりが記録より後なら、その週から', () => {
+    const w = weeklyXp(sets, sessions, DEFAULT_EXERCISES, S, xp, '2026-11-10', '2026-11-12');
+    expect(w.map((x) => x.week)).toEqual(['2026-11-09']);
   });
 
   it('記録がなければ空', () => {

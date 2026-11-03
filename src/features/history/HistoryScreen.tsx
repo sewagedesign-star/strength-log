@@ -6,6 +6,7 @@ import { formatDate } from '../../domain/date';
 import { CATEGORIES, CATEGORY_LABEL, type Category, type Exercise, type SetRecord } from '../../domain/types';
 import { fmtNum, useAllData, useXp } from '../../data';
 import { setSummary } from '../record/ExerciseSheet';
+import { GraphView } from './GraphView';
 import styles from './HistoryScreen.module.css';
 
 export function HistoryScreen() {
@@ -13,6 +14,7 @@ export function HistoryScreen() {
   const xp = useXp(data);
   const [filter, setFilter] = useState<Category | null>(null);
   const [editing, setEditing] = useState<SetRecord | null>(null);
+  const [view, setView] = useState<'list' | 'graph'>('list');
 
   const days = useMemo(() => {
     if (!data) return [];
@@ -42,45 +44,62 @@ export function HistoryScreen() {
 
   return (
     <div className={styles.screen}>
-      <h1 className={styles.h1}>履歴</h1>
-      <div className={styles.filters} role="tablist" aria-label="分類で絞り込み">
-        {[null, ...CATEGORIES].map((c) => (
-          <button
-            key={c ?? 'all'}
-            type="button"
-            role="tab"
-            aria-selected={filter === c}
-            className={filter === c ? styles.on : ''}
-            onClick={() => setFilter(c)}
-          >
-            {c ? CATEGORY_LABEL[c] : 'すべて'}
+      <div className={styles.top}>
+        <h1 className={styles.h1}>履歴</h1>
+        <div className={styles.views} role="tablist" aria-label="表示">
+          <button type="button" role="tab" aria-selected={view === 'list'} className={view === 'list' ? styles.on : ''} onClick={() => setView('list')}>
+            一覧
           </button>
-        ))}
+          <button type="button" role="tab" aria-selected={view === 'graph'} className={view === 'graph' ? styles.on : ''} onClick={() => setView('graph')}>
+            グラフ
+          </button>
+        </div>
       </div>
 
-      {days.length === 0 && <p className="sub">記録がありません</p>}
-
-      {days.map(({ session, groups }) => (
-        <section key={session.id} className={`card ${styles.day}`}>
-          <div className={styles.dayHead}>
-            <h2 className={styles.date}>{formatDate(session.date)}</h2>
-            {!filter && <span className={styles.xp}>+{fmtNum(xpByDate.get(session.id) ?? 0)} XP</span>}
+      {view === 'graph' ? (
+        <GraphView data={data} xp={xp} />
+      ) : (
+        <>
+          <div className={styles.filters} role="tablist" aria-label="分類で絞り込み">
+            {[null, ...CATEGORIES].map((c) => (
+              <button
+                key={c ?? 'all'}
+                type="button"
+                role="tab"
+                aria-selected={filter === c}
+                className={filter === c ? styles.on : ''}
+                onClick={() => setFilter(c)}
+              >
+                {c ? CATEGORY_LABEL[c] : 'すべて'}
+              </button>
+            ))}
           </div>
-          {groups.map(({ ex, list }) => (
-            <div key={list[0].exerciseId} className={styles.group}>
-              <h3 className={styles.exName}>{ex?.name ?? '（削除された種目）'}</h3>
-              {list.map((s) => (
-                <button key={s.id} type="button" className={styles.set} onClick={() => setEditing(s)}>
-                  <span className={styles.setNo}>{s.setNo}</span>
-                  <span className={styles.setBody}>{setSummary(s).replace(/ R(\d+)$/, '回')}</span>
-                  <span className="sub">RPE{s.rpe}</span>
-                  {s.note && <span className={styles.note}>📝</span>}
-                </button>
+
+          {days.length === 0 && <p className="sub">記録がありません</p>}
+
+          {days.map(({ session, groups }) => (
+            <section key={session.id} className={`card ${styles.day}`}>
+              <div className={styles.dayHead}>
+                <h2 className={styles.date}>{formatDate(session.date)}</h2>
+                {!filter && <span className={styles.xp}>+{fmtNum(xpByDate.get(session.id) ?? 0)} XP</span>}
+              </div>
+              {groups.map(({ ex, list }) => (
+                <div key={list[0].exerciseId} className={styles.group}>
+                  <h3 className={styles.exName}>{ex?.name ?? '（削除された種目）'}</h3>
+                  {list.map((s) => (
+                    <button key={s.id} type="button" className={styles.set} onClick={() => setEditing(s)}>
+                      <span className={styles.setNo}>{s.setNo}</span>
+                      <span className={styles.setBody}>{setSummary(s).replace(/ R(\d+)$/, '回')}</span>
+                      <span className="sub">RPE{s.rpe}</span>
+                      {s.note && <span className={styles.note}>📝</span>}
+                    </button>
+                  ))}
+                </div>
               ))}
-            </div>
+            </section>
           ))}
-        </section>
-      ))}
+        </>
+      )}
 
       {editing && editingEx && (
         <EditSetDialog key={editing.id} record={editing} exercise={editingEx} bodyWeight={data.settings.bodyWeight} onClose={() => setEditing(null)} />

@@ -10,6 +10,37 @@
   font-weight: 800;
 }
 
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.views {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 3px;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.views > button {
+  min-height: var(--tap);
+  min-width: 76px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  font-weight: 700;
+  color: var(--text-sub);
+}
+
+.views > button.on {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
 .filters {
   display: flex;
   gap: 6px;

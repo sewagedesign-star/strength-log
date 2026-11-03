@@ -111,7 +111,10 @@ export interface WeekXp {
 
 const emptyParts = (): Record<WeekPart, number> => ({ chest: 0, back: 0, armsShoulders: 0, legs: 0, other: 0, bonus: 0 });
 
-/** 週ごとのXP（部位別＋ボーナス）。from の週から today の週まで、記録のない週も 0 で埋める */
+/**
+ * 週ごとのXP（部位別＋ボーナス）。記録の始まった週（from より前なら from の週）から today の週まで。
+ * 間の記録のない週は 0 で埋める
+ */
 export function weeklyXp(
   sets: SetRecord[],
   sessions: Session[],
@@ -142,9 +145,10 @@ export function weeklyXp(
   }
 
   const dates = [...weeks.keys()].sort();
-  let first = from ? weekStart(from) : dates[0];
-  if (!first) return [];
+  if (dates.length === 0) return [];
+  const fromWeek = from ? weekStart(from) : dates[0];
   const last = weekStart(today);
+  let first = dates[0] > fromWeek ? dates[0] : fromWeek;
   if (first > last) first = last;
 
   const result: WeekXp[] = [];
