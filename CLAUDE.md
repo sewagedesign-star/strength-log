@@ -40,6 +40,7 @@ workout-app/
   src/
     main.tsx / App.tsx    … タブ切替
     data.ts               … useAllData / useXp（全画面共通の読み込み）
+    sound.ts              … 効果音
     styles/               … global.css（リセット・CSS 変数・セーフエリア・共通部品）
     domain/               … 純粋関数のみ（DB・React に依存しない）
       types.ts            … Exercise / Session / SetRecord / Settings / Goal
@@ -48,6 +49,8 @@ workout-app/
       xp.ts               … 1セットXP、推定1RM（Epley）、ボーナス、累計XP
       level.ts            … 累計XP → レベル・称号・次レベルまでの残り
       goals.ts            … 種目目標の達成判定
+      stats.ts            … グラフ用の集計（種目ごとの推移・週ごとのXP）
+      achievements.ts     … 実績（バッジ）の定義と判定
       *.test.ts           … Vitest（domain は全関数テスト）
     db/
       db.ts               … Dexie のスキーマとバージョン、初回の初期データ投入
@@ -82,6 +85,14 @@ workout-app/
 - その他：バーベルスクワットは1種目（器具＝バーベル）。分類に「その他」を追加（レーダーは4部位）。
   週は月曜始まり、週間クエストは記録した日数で数え週1回。自己ベストは1日1種目1回、初挑戦の日は付かない。
   バックアップの読み込みで同じ日付の別セッションは今のセッションにまとめる。設定は読み込まない。
+
+## フェーズ2で決めたこと（ユーザー回答 1A・2A・3A・4B・5A）
+1. グラフは履歴画面の「一覧／グラフ」切替（タブは4つのまま）。部品は使わず SVG を自前で描く。
+   部位の色は固定（並び順で色覚の見分けやすさを検査済み）、色だけに頼らないよう週の内訳を数値でも出す。
+2. 実績に XP は付けない。実績（24個、domain/achievements.ts）は保存せず記録から計算。
+3. レベルアップ・目標達成・実績は画面中央のカード（タップで次へ）。獲得XPは上のトースト。
+4. 効果音あり（Web Audio で生成、設定で消せる。iPhone ではボタンを押した瞬間に primeAudio が必要）。
+5. 実績は計画の24個。
 
 ## GitHub・公開
 - リポジトリ：`sewagedesign-star/strength-log`（Public）。手元のフォルダ名は workout-app のまま。
