@@ -1,37 +1,21 @@
 import { useRef, useState } from 'react';
 import { ConfirmDialog } from '../../components/Sheet';
-import { exportBackup, importBackup, parseBackup, type BackupFile } from '../../db/backup';
-import { formatShortDate, toDateKey } from '../../domain/date';
-import { Section } from './SettingsScreen';
+import { importBackup, parseBackup, type BackupFile } from '../../db/backup';
+import { formatDate, formatShortDate, toDateKey } from '../../domain/date';
+import type { Settings } from '../../domain/types';
+import { exportToFile } from '../../backupFile';
+import { NumberField, Row, Section } from './SettingsScreen';
 import styles from './Settings.module.css';
 
-export function BackupSection() {
+export function BackupSection({ settings, onSave }: { settings: Settings; onSave: (p: Partial<Settings>) => void }) {
+  const last = settings.backup.lastExportAt;
   const fileRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState('');
   const [pending, setPending] = useState<BackupFile | null>(null);
 
   const doExport = async () => {
-    const b = await exportBackup();
-    const name = `workout-backup-${toDateKey().replace(/-/g, '')}.json`;
-    const file = new File([JSON.stringify(b, null, 1)], name, { type: 'application/json' });
-    // iPhone では共有シートから「ファイルに保存」できる
-    const touch = window.matchMedia('(pointer: coarse)').matches;
-    if (touch && navigator.canShare?.({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file], title: name });
-        setMessage(`書き出しました（記録 ${b.sets.length} 件）`);
-      } catch {
-        /* 共有をやめたとき */
-      }
-      return;
-    }
-    const url = URL.createObjectURL(file);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = name;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    setMessage(`「${name}」を書き出しました（記録 ${b.sets.length} 件）`);
+    const r = await exportToFile();
+    if (r) setMessage(r.shared ? `書き出しました（記録 ${r.count} 件）` : `「${r.name}」を書き出しました（記録 ${r.count} 件）`);
   };
 
   const onFile = async (f: File | undefined) => {
@@ -57,6 +41,18 @@ export function BackupSection() {
 
   return (
     <Section title="バックアップ" note="機種変更やブラウザを変えるときに使います">
+      <p className={styles.formula}>
+        最後の書き出し：{last ? formatDate(toDateKey(new Date(last))) : 'まだありません'}
+      </p>
+      <Row label="お知らせの間隔" hint="最後の書き出しからこの日数で、記録画面にお知らせを出します">
+        <NumberField
+          value={settings.backup.intervalDays}
+          unit="日"
+          min={1}
+          integer
+          onCommit={(v) => onSave({ backup: { ...settings.backup, intervalDays: v } })}
+        />
+      </Row>
       <button type="button" className={`btn btn-primary ${styles.wide}`} onClick={doExport}>
         JSON に書き出す
       </button>

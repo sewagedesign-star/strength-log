@@ -6,6 +6,7 @@ import { levelFromXp } from '../../domain/level';
 import { CATEGORIES, CATEGORY_LABEL, type Category } from '../../domain/types';
 import { useAllData, useXp } from '../../data';
 import { ExerciseSheet, setSummary } from './ExerciseSheet';
+import { BackupBanner } from './BackupBanner';
 import styles from './RecordScreen.module.css';
 
 /** 日付が変わったら（日をまたいで開きっぱなしでも）今日に追従する */
@@ -72,6 +73,11 @@ export function RecordScreen() {
           <span className={styles.title}>{level.title}</span>
         </div>
       </header>
+
+      <BackupBanner
+        settings={data.settings}
+        firstRecordAt={data.sets.length ? Math.min(...data.sets.map((s) => s.createdAt)) : null}
+      />
 
       <div className={styles.cats} role="tablist" aria-label="分類">
         {CATEGORIES.map((c) => (

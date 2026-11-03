@@ -12,6 +12,7 @@ import {
   type Exercise,
 } from '../../domain/types';
 import { fmtNum } from '../../data';
+import { REST_FALLBACK } from '../../domain/defaults';
 import { NumberField, Section } from './SettingsScreen';
 import styles from './Settings.module.css';
 
@@ -37,6 +38,7 @@ export function ExerciseSection({ exercises }: { exercises: Exercise[] }) {
                   <span className="sub">
                     {CATEGORY_LABEL[e.category]}
                     {kindOf(e) === 'weight' ? `・刻み ${fmtNum(e.step)}kg` : `・体重×${fmtNum(e.bodyweightRatio)}`}
+                    {`・休憩 ${e.restSec ?? REST_FALLBACK}秒`}
                   </span>
                 </button>
                 <button
@@ -75,6 +77,7 @@ function ExerciseDialog({ exercise, nextOrder, onClose }: { exercise?: Exercise;
   const [kind, setKind] = useState<Kind>(exercise ? kindOf(exercise) : 'weight');
   const [step, setStep] = useState(exercise?.step ?? 1);
   const [ratio, setRatio] = useState(exercise?.bodyweightRatio ?? 1);
+  const [rest, setRest] = useState(exercise?.restSec ?? REST_FALLBACK);
   const [error, setError] = useState('');
 
   const save = async () => {
@@ -88,6 +91,7 @@ function ExerciseDialog({ exercise, nextOrder, onClose }: { exercise?: Exercise;
       isBodyweight: kind === 'bodyweight',
       bodyweightRatio: ratio,
       step,
+      restSec: rest,
       visible: exercise?.visible ?? true,
       isCustom: exercise?.isCustom ?? true,
       order: exercise?.order ?? nextOrder,
@@ -151,6 +155,15 @@ function ExerciseDialog({ exercise, nextOrder, onClose }: { exercise?: Exercise;
             </div>
           </div>
         )}
+        <div className={styles.row}>
+          <div className={styles.rowLabel}>
+            <span>休憩時間</span>
+            <span className={styles.hint}>保存したあとの休憩タイマー</span>
+          </div>
+          <div className={styles.rowField}>
+            <NumberField value={rest} unit="秒" min={10} max={600} integer onCommit={setRest} />
+          </div>
+        </div>
         {error && <p className={styles.error}>{error}</p>}
         <div className={styles.actions}>
           <button type="button" className="btn" onClick={onClose}>

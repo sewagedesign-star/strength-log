@@ -101,7 +101,7 @@ export function SettingsScreen() {
           ))}
       </Section>
 
-      <BackupSection />
+      <BackupSection settings={s} onSave={save} />
 
       <p className={`sub ${styles.footer}`}>データはこの端末の中だけに保存されます。</p>
 
